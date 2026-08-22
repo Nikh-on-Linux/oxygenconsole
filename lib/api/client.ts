@@ -1,6 +1,24 @@
 import axios from 'axios';
 
 export const apiClient = axios.create({
+  baseURL: "/api/oxygen",
+  timeout: 10000,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('API error:', error.response?.data || error.message);
+    return Promise.reject(error);
+  }
+);
+
+export const oxygenClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_OXYGEN_URL,
   timeout: 10000,
   withCredentials: true,
@@ -9,7 +27,7 @@ export const apiClient = axios.create({
   },
 });
 
-apiClient.interceptors.response.use(
+oxygenClient.interceptors.response.use(
   (response) => response,
   (error) => {
     console.error('API error:', error.response?.data || error.message);

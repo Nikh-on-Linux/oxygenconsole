@@ -8,13 +8,47 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { useState } from "react";
+import { Loader2Icon } from "lucide-react";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+  const [isLoading, setLoading] = useState(false);
+  const [email, setEmail] = useState<String>();
+  const [password, setPassword] = useState<String>();
+
+  async function handleSubmit(e:any) {
+    e.preventDefault();
+    setLoading(true);
+    console.log(isLoading, password, email)
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        'Content-Type': "application/json"
+      },
+      body: JSON.stringify({
+        "email": email,
+        "password": password
+      })
+    })
+
+    const data = await response.json();
+    if (data.suc) {
+      setLoading(false);
+      alert("use logged in");
+      return;
+    }
+
+    setLoading(false);
+    console.log(data.error);
+    alert("Error in authentication");
+    return;
+  }
+
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
+    <form onSubmit={handleSubmit} className={cn("flex flex-col gap-6", className)} {...props}>
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Login to your account</h1>
@@ -22,9 +56,9 @@ export function LoginForm({
             Enter your email below to login to your account
           </p>
         </div>
-        <Field>
+        <Field >
           <FieldLabel htmlFor="email">Email</FieldLabel>
-          <Input id="email" type="email" placeholder="m@example.com" required />
+          <Input id="email" type="email" onChange={(e) => setEmail(e.target.value)} placeholder="m@example.com" required />
         </Field>
         <Field>
           <div className="flex items-center">
@@ -36,12 +70,22 @@ export function LoginForm({
               Forgot your password?
             </a>
           </div>
-          <Input id="password" type="password" required />
+          <Input id="password" type="password" required onChange={(e) => setPassword(e.target.value)} />
         </Field>
         <Field>
-          <Button type="submit">Login</Button>
+          <Button disabled={isLoading ? true : false} type="submit">
+            {
+              isLoading ?
+                <>
+                  <Loader2Icon className="animate-spin" />
+                  <span>Authenticating...</span>
+                </>
+                :
+                <span>Login</span>
+            }
+          </Button>
         </Field>
-        <FieldSeparator>Or continue with</FieldSeparator>
+        {/* <FieldSeparator>Or continue with</FieldSeparator>
         <Field>
           <Button variant="outline" type="button">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -58,7 +102,7 @@ export function LoginForm({
               Sign up
             </a>
           </FieldDescription>
-        </Field>
+        </Field> */}
       </FieldGroup>
     </form>
   )

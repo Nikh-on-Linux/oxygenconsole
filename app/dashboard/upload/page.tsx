@@ -35,8 +35,8 @@ function UploadPage() {
         }
     }
     return (
-        <section className='w-full h-full px-4 flex items-center justify-center overflow-y-auto' >
-            <div className=' lg:max-w-[60rem] w-full mx-6 aspect-video flex items-center justify-center border-border border-2 border-dashed rounded-lg' >
+        <section className=' w-full px-4 flex items-center justify-center overflow-y-auto' >
+            <div className=' lg:max-w-[60rem] w-full aspect-video flex items-center justify-center border-border border-2 border-dashed rounded-lg' >
                 {
                     !fileSelected ?
                         <>

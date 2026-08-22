@@ -1,29 +1,57 @@
 "use client";
 
 import DirectoryWindow from "@/components/directorywindow";
-import FileBox from "@/components/filebox";
 import FolderBox from "@/components/folderbox";
 import NewItemButton from "@/components/newItem";
+import NewDialogue from "@/components/newitemdialogue";
 import { useFileStore } from "@/lib/store/FolderFileStore";
 import { useTopPanelStore } from "@/lib/store/TopPanelStore";
+import { useParams } from "next/navigation";
 import { useEffect } from "react";
 
-function MyAir() {
+function calculateBackPath(path: string[]): string {
+  const parentPath = path.slice(0, -1);
+
+  if (parentPath.length === 0) {
+    return "/dashboard/myair";
+  }
+
+  return `/dashboard/myair/${parentPath.join("/")}`;
+}
+
+function DirectoryPage() {
+  const { path } = useParams<{ path?: string[] }>();
+
+  const currentPath = path ?? [];
+  const pathString = currentPath.join("/");
+
   const items = useFileStore((state) => state.items);
 
   useEffect(() => {
     const topPanel = useTopPanelStore.getState();
 
-    topPanel.setPageTitle("My Air");
+    const currentFolderName =
+      currentPath.at(-1) ?? "My Air";
+
+    topPanel.setPageTitle(currentFolderName);
     topPanel.setBreadCrumbs(true);
+    topPanel.setIsNested(currentPath.length > 0);
     topPanel.setAction(<NewItemButton />)
 
-    useFileStore.getState().fetchFolder("/");
+    if (currentPath.length > 0) {
+      topPanel.setBackPath(
+        calculateBackPath(currentPath)
+      );
+    }
+
+    useFileStore
+      .getState()
+      .fetchFolder(pathString || "/");
 
     return () => {
-      useTopPanelStore.getState().reset();
+      topPanel.reset();
     };
-  }, []);
+  }, [pathString]);
 
   return (
     <section className="h-full w-full overflow-x-hidden overflow-y-auto px-4 py-2">
@@ -35,17 +63,9 @@ function MyAir() {
             folderid={folder.folder_id}
           />
         ))}
-
-        {items.files.map((file) => (
-          <FileBox
-            key={file.file_id}
-            fileid={file.file_id}
-            filename={file.file_name}
-          />
-        ))}
       </DirectoryWindow>
     </section>
   );
 }
 
-export default MyAir;
+export default DirectoryPage;
