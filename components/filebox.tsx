@@ -14,7 +14,7 @@ import {
     ContextMenuTrigger,
 } from "@/components/ui/context-menu"
 
-function FileBox({ filename = "SampleFile very big text..tx and someh", filetype = "txt" }) {
+function FileBox({ filename = "SampleFile very big text..tx and someh", fileid = "", filetype = "txt" }) {
     return (
         <div className='w-37 aspect-square  py-2 group hover:bg-accent/50 rounded-lg ' >
             <ContextMenu>

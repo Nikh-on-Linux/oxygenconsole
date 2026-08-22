@@ -78,7 +78,9 @@ function IntegrationsPage() {
       </Button>
     )
 
-    return () => useTopPanelStore.getState().resetAction();
+    useTopPanelStore.getState().setPageTitle("Integrations")
+
+    return () => useTopPanelStore.getState().reset();
   }, [])
 
   return (
