@@ -7,6 +7,7 @@ import NewItemButton from "@/components/newItem";
 import { useFileStore } from "@/lib/store/FolderFileStore";
 import { useTopPanelStore } from "@/lib/store/TopPanelStore";
 import { useEffect } from "react";
+import { useParams } from "next/navigation";
 
 function MyAir() {
   const items = useFileStore((state) => state.items);
@@ -40,7 +41,7 @@ function MyAir() {
           <FileBox
             key={file.file_id}
             fileid={file.file_id}
-            filename={file.file_name}
+            filename={file.filename}
           />
         ))}
       </DirectoryWindow>

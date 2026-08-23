@@ -1,6 +1,7 @@
 "use client";
 
 import DirectoryWindow from "@/components/directorywindow";
+import FileBox from "@/components/filebox";
 import FolderBox from "@/components/folderbox";
 import NewItemButton from "@/components/newItem";
 import NewDialogue from "@/components/newitemdialogue";
@@ -22,7 +23,9 @@ function calculateBackPath(path: string[]): string {
 function DirectoryPage() {
   const { path } = useParams<{ path?: string[] }>();
 
-  const currentPath = path ?? [];
+  const currentPath = (path ?? []).map((segment) =>
+    decodeURIComponent(segment)
+  );
   const pathString = currentPath.join("/");
 
   const items = useFileStore((state) => state.items);
@@ -63,6 +66,11 @@ function DirectoryPage() {
             folderid={folder.folder_id}
           />
         ))}
+        {items.files.map((file, key) => {
+          return (
+            <FileBox key={key} filename={file.filename} fileid={file.file_id} />
+          )
+        })}
       </DirectoryWindow>
     </section>
   );

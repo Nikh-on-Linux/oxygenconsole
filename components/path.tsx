@@ -154,31 +154,37 @@ function PathNavigation() {
      * project1
      * src
      */
-    const breadcrumbItems = directoryPath.map(
-        (segment, index) => {
-            const parentPath = directoryPath.slice(
-                0,
-                index + 1
-            );
+    const breadcrumbItems =
+        directoryPath.length === 0
+            ? [
+                {
+                    segment: "",
+                    route: FRONTEND_ROOT,
+                    isCurrent: true,
+                },
+            ]
+            : directoryPath.map((segment, index) => {
+                const parentPath = directoryPath.slice(
+                    0,
+                    index + 1
+                );
 
-            const route = getRouteFromDirectoryPath(
-                parentPath
-            );
+                const route =
+                    getRouteFromDirectoryPath(parentPath);
 
-            const isCurrent =
-                index === directoryPath.length - 1;
+                const isCurrent =
+                    index === directoryPath.length - 1;
 
-            return {
-                segment,
-                route,
-                isCurrent,
-            };
-        }
-    );
+                return {
+                    segment,
+                    route,
+                    isCurrent,
+                };
+            });
 
-    useEffect(()=>{
+    useEffect(() => {
         useTopPanelStore.getState().setPathInfo(breadcrumbItems);
-    },[breadcrumbItems])
+    }, [breadcrumbItems])
 
     return (
         <div

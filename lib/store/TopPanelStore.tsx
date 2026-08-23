@@ -15,7 +15,7 @@ interface TopPanelState {
   showBreadCrumbs: Boolean;
   isNested: Boolean;
   backPath: String;
-  currentPath: String;
+  currentPath: string;
 }
 
 interface PathSegmentInterface {
@@ -39,7 +39,7 @@ export const useTopPanelStore = create<TopPanelState>((set) => ({
   setPathInfo: (pathstate) => {
     let path = "";
     pathstate.forEach((segment:PathSegmentInterface)=>{
-      path += `/${segment.segment}`;
+      path += `/${decodeURIComponent(segment.segment)}`;
     })
     set({currentPath:path});
   },
