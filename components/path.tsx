@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
     Breadcrumb,
@@ -10,6 +10,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "./ui/breadcrumb";
+import { useTopPanelStore } from "@/lib/store/TopPanelStore";
 
 const FRONTEND_ROOT = "/dashboard/myair";
 
@@ -174,6 +175,10 @@ function PathNavigation() {
             };
         }
     );
+
+    useEffect(()=>{
+        useTopPanelStore.getState().setPathInfo(breadcrumbItems);
+    },[breadcrumbItems])
 
     return (
         <div

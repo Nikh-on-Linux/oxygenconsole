@@ -14,8 +14,9 @@ export async function getFolderContents(folderId: string) {
   return res.data.data;
 }
 
-export async function createNewFolder(pathstring: string){
-  let path = ""
-  pathstring == "/" ? path = "/" : path=`/${pathstring}`
-  console.log()
+export async function createNewFolder(pathstring: String, foldername: String) {
+  const res = await apiClient.post(`/user/createfolder/${foldername}`, {
+    path: pathstring
+  });
+  return res.data;
 }
