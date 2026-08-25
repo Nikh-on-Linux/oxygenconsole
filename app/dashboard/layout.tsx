@@ -16,6 +16,7 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar"
 import StatusBar from '@/components/statusbar';
+import UploadBar from '@/components/uploadbar';
 
 
 function Dashboardlayout({ children }: { children: React.ReactNode }) {
@@ -26,6 +27,7 @@ function Dashboardlayout({ children }: { children: React.ReactNode }) {
                 <main className='w-full h-full overflow-hidden' >
                     <StatusBar />
                     {children}
+                    <UploadBar />
                 </main>
             </SidebarInset>
         </SidebarProvider>

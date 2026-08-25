@@ -2,9 +2,9 @@ import { apiClient } from "@/lib/api/client";
 import http from "http";
 import https from "https";
 
-export interface BaseApiResponse{
-    message?:string;
-    suc?:boolean;
+export interface BaseApiResponse {
+    message?: string;
+    suc?: boolean;
 }
 
 export interface InitUploadResponse extends BaseApiResponse {
@@ -17,18 +17,18 @@ export interface UploadStatusResponse extends BaseApiResponse {
     status: string;
 }
 
-export interface CompleteUploadResponse extends BaseApiResponse {}
+export interface CompleteUploadResponse extends BaseApiResponse { }
 
-export interface ChunkInformation{
-    upload_id:string;
-    part_number:number;
-    size:number;
-    file_path:string;
-    uploaded_at:string;
+export interface ChunkInformation {
+    upload_id: string;
+    part_number: number;
+    size: number;
+    file_path: string;
+    uploaded_at: string;
 }
 
-export interface ChunkStatusResponse extends BaseApiResponse{
-    data:ChunkInformation[]
+export interface ChunkStatusResponse extends BaseApiResponse {
+    data: ChunkInformation[]
 }
 
 /**
@@ -77,7 +77,7 @@ export async function uploadChunk(
     );
 
     return response.data;
-} 
+}
 // Need to check http keep alive parameter;
 
 /**
@@ -120,5 +120,13 @@ export async function getChunkStatus(uploadId: string): Promise<
             `/upload/info/chunks/${encodeURIComponent(uploadId)}`
         );
     console.log(response.data);
+    return response.data;
+}
+
+export async function cancelUpload(uploadId: string): Promise<BaseApiResponse> {
+    const response = await apiClient.delete(
+        `/upload/${encodeURIComponent(uploadId)}`
+    );
+
     return response.data;
 }
