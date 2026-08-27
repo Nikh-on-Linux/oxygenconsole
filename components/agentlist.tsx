@@ -13,55 +13,80 @@ import { Badge } from './ui/badge';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
 import { PenIcon, Trash2Icon } from 'lucide-react';
+import { Agent } from '@/lib/types/agent';
 
-export interface datatype {
-    name: String,
-    isActive: Boolean,
-    target: String,
-    scopes: String
+export interface AgentListProps {
+    data: Agent[];
+    className?: string;
+    onEdit?: (agent: Agent) => void;
+    onDelete?: (agent: Agent) => void;
+    isLoading?: boolean;
 }
 
-function AgentList({ data, className }: { data: Array<datatype>, className?: String }) {
+function AgentList({ data, className, onEdit, onDelete, isLoading }: AgentListProps) {
     return (
-        <Table className={cn(className, "border")} >
-            <TableCaption>A list of your agents.</TableCaption>
+        <Table className={cn(className, "border")}>
+            <TableCaption>
+                {isLoading ? "Loading agents..." : data.length === 0 ? "No agents found." : "A list of your agents."}
+            </TableCaption>
             <TableHeader className='bg-accent border rounded-2xl'>
-                <TableRow className='' >
+                <TableRow>
                     <TableHead className="w-[15rem] border">Agent Name</TableHead>
                     <TableHead className='w-[6rem] border'>Status</TableHead>
                     <TableHead className='border'>Target Folder</TableHead>
-                    <TableHead className="w-[6rem] border">scopes</TableHead>
+                    <TableHead className="w-[6rem] border">Scopes</TableHead>
                     <TableHead className='w-[10rem] border text-right'>Actions</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {
-                    data.map((item, key) => {
-                        return (
-                            <TableRow key={key} >
-                                <TableCell className="font-medium border">{item.name}</TableCell>
-                                <TableCell>
-                                    {
-                                        item.isActive ? <Badge variant="secondary" className={`${item.isActive ? "bg-green-800" : ""}`}>Active</Badge> : <Badge variant="secondary">Inactive</Badge>
-                                    }
-                                </TableCell>
-                                <TableCell className='border'>{item.target}</TableCell>
-                                <TableCell className="border"><Badge variant="secondary">{item.scopes}</Badge></TableCell>
-                                <TableCell className='flex justify-end gap-3 items-center'>
-                                    <Button size={"icon-sm"} className={"group"} variant={"outline"} >
-                                        <PenIcon className='text-muted-foreground group-hover:text-foreground' />
-                                    </Button>
-                                    <Button size={"icon-sm"} className={"group"} variant={"outline"} >
-                                        <Trash2Icon className='text-destructive/60 group-hover:text-destructive' />
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        )
-                    })
-                }
+                {data.map((item, key) => {
+                    const agentId = item.agent_id || item._id || item.id || String(key);
+                    const name = item.name || "Unnamed Agent";
+                    const target = item.path || item.target || item.targetFolder || "/";
+                    const scopes = item.scopes || item.scope || "r";
+                    const isActive = item.isActive !== undefined ? item.isActive : item.active !== undefined ? item.active : true;
+
+
+                    return (
+                        <TableRow key={agentId}>
+                            <TableCell className="font-medium border">{name}</TableCell>
+                            <TableCell className="border">
+                                {isActive ? (
+                                    <Badge variant="secondary" className="bg-emerald-600/20 text-emerald-500 hover:bg-emerald-600/30 border-emerald-500/30">
+                                        Active
+                                    </Badge>
+                                ) : (
+                                    <Badge variant="secondary" className="bg-muted text-muted-foreground">
+                                        Inactive
+                                    </Badge>
+                                )}
+                            </TableCell>
+                            <TableCell className='border'>{target}</TableCell>
+                            <TableCell className="border"><Badge variant="secondary">{scopes}</Badge></TableCell>
+                            <TableCell className='flex justify-end gap-3 items-center border'>
+                                <Button 
+                                    size={"icon-sm"} 
+                                    className={"group"} 
+                                    variant={"outline"}
+                                    onClick={() => onEdit && onEdit(item)}
+                                >
+                                    <PenIcon className='text-muted-foreground group-hover:text-foreground h-4 w-4' />
+                                </Button>
+                                <Button 
+                                    size={"icon-sm"} 
+                                    className={"group"} 
+                                    variant={"outline"}
+                                    onClick={() => onDelete && onDelete(item)}
+                                >
+                                    <Trash2Icon className='text-destructive/60 group-hover:text-destructive h-4 w-4' />
+                                </Button>
+                            </TableCell>
+                        </TableRow>
+                    );
+                })}
             </TableBody>
         </Table>
-    )
+    );
 }
 
-export default AgentList
+export default AgentList;
