@@ -37,10 +37,21 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     try {
       const res = await createAgent(data);
       await get().fetchAgents();
+
+      const extractedApiKey =
+        res?.apiKey ||
+        res?.api_key ||
+        res?.key ||
+        res?.agent?.apiKey ||
+        res?.agent?.api_key ||
+        res?.data?.apiKey ||
+        res?.data?.api_key ||
+        null;
+
       return {
         success: true,
         agent: res?.agent || res?.data,
-        apiKey: res?.apiKey || res?.key || res?.agent?.apiKey,
+        apiKey: extractedApiKey,
       };
     } catch (err: unknown) {
       set({

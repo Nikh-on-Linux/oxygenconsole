@@ -52,6 +52,11 @@ function IntegrationsPage() {
   const [activeScope, setActiveScope] = useState("r");
   const [isActive, setIsActive] = useState(true);
 
+  // Webhook Form State
+  const [webhookUrl, setWebhookUrl] = useState("");
+  const [webhookEnabled, setWebhookEnabled] = useState(false);
+  const [eventType] = useState("file.uploaded");
+
   // Fetch agents on mount
   useEffect(() => {
     fetchAgents();
@@ -77,6 +82,8 @@ function IntegrationsPage() {
     setTarget("");
     setActiveScope("r");
     setIsActive(true);
+    setWebhookUrl("");
+    setWebhookEnabled(false);
     setOpen(true);
   };
 
@@ -85,12 +92,23 @@ function IntegrationsPage() {
     setName(agent.name || "");
     setTarget(agent.path || agent.target || agent.targetFolder || "");
     setActiveScope(agent.scopes || agent.scope || "r");
-    setIsActive(
-      agent.isActive !== undefined
-        ? agent.isActive
-        : agent.active !== undefined
-        ? agent.active
-        : true
+
+    const activeState = agent.enabled !== undefined && agent.enabled !== null
+      ? Boolean(agent.enabled)
+      : agent.isActive !== undefined
+      ? Boolean(agent.isActive)
+      : agent.active !== undefined
+      ? Boolean(agent.active)
+      : true;
+
+    setIsActive(activeState);
+    setWebhookUrl(agent.target_url || agent.webhook?.target_url || "");
+    setWebhookEnabled(
+      agent.enabled !== undefined && agent.enabled !== null
+        ? Boolean(agent.enabled)
+        : agent.webhook?.enabled !== undefined
+        ? Boolean(agent.webhook.enabled)
+        : activeState
     );
     setOpen(true);
   };
@@ -102,20 +120,30 @@ function IntegrationsPage() {
     const initialName = editingAgent.name || "";
     const initialTarget = editingAgent.path || editingAgent.target || editingAgent.targetFolder || "";
     const initialScope = editingAgent.scopes || editingAgent.scope || "r";
-    const initialIsActive =
-      editingAgent.isActive !== undefined
-        ? editingAgent.isActive
-        : editingAgent.active !== undefined
-        ? editingAgent.active
-        : true;
+    const initialIsActive = editingAgent.enabled !== undefined && editingAgent.enabled !== null
+      ? Boolean(editingAgent.enabled)
+      : editingAgent.isActive !== undefined
+      ? Boolean(editingAgent.isActive)
+      : editingAgent.active !== undefined
+      ? Boolean(editingAgent.active)
+      : true;
+
+    const initialWebhookUrl = editingAgent.target_url || editingAgent.webhook?.target_url || "";
+    const initialWebhookEnabled = editingAgent.enabled !== undefined && editingAgent.enabled !== null
+      ? Boolean(editingAgent.enabled)
+      : editingAgent.webhook?.enabled !== undefined
+      ? Boolean(editingAgent.webhook.enabled)
+      : initialIsActive;
 
     return (
       name !== initialName ||
       target !== initialTarget ||
       activeScope !== initialScope ||
-      isActive !== initialIsActive
+      isActive !== initialIsActive ||
+      webhookUrl !== initialWebhookUrl ||
+      webhookEnabled !== initialWebhookEnabled
     );
-  }, [editingAgent, name, target, activeScope, isActive]);
+  }, [editingAgent, name, target, activeScope, isActive, webhookUrl, webhookEnabled]);
 
   const handleSubmit = async () => {
     if (!name.trim()) {
@@ -129,6 +157,12 @@ function IntegrationsPage() {
       return;
     }
 
+    const webhookPayload = {
+      target_url: webhookUrl.trim(),
+      enabled: webhookEnabled,
+      event_type: eventType,
+    };
+
     setIsSubmitting(true);
     try {
       if (editingAgent) {
@@ -139,13 +173,14 @@ function IntegrationsPage() {
           editingAgent.id || 
           (editingAgent.name ? agents.find(a => a.name === editingAgent.name)?.agent_id || agents.find(a => a.name === editingAgent.name)?._id || agents.find(a => a.name === editingAgent.name)?.id : undefined);
 
-        if (agentId) {
+        if (agentId !== undefined && agentId !== null) {
           const success = await editAgent(String(agentId), {
             name,
             path: target,
             target,
             scopes: activeScope,
             isActive,
+            webhook: webhookPayload,
           });
           if (success) {
             toast.success("Agent updated successfully");
@@ -163,15 +198,15 @@ function IntegrationsPage() {
           target,
           scopes: activeScope,
           isActive,
+          webhook: webhookPayload,
         });
         if (res.success) {
           toast.success("Agent created successfully");
           setOpen(false);
-          if (res.apiKey) {
-            setCreatedApiKey(res.apiKey);
-            setHasCopied(false);
-            setKeyDialogOpen(true);
-          }
+          const keyToShow = res.apiKey || "API Key generated successfully (Check response headers/payload)";
+          setCreatedApiKey(keyToShow);
+          setHasCopied(false);
+          setKeyDialogOpen(true);
         } else {
           toast.error("Failed to create agent");
         }
@@ -183,7 +218,7 @@ function IntegrationsPage() {
 
   const handleDelete = async (agent: Agent) => {
     const agentId = agent.agent_id || agent._id || agent.id;
-    if (agentId) {
+    if (agentId !== undefined && agentId !== null) {
       const success = await removeAgent(String(agentId));
       if (success) {
         toast.success("Agent deleted successfully");
@@ -216,7 +251,7 @@ function IntegrationsPage() {
 
       {/* Sheet for Create / Edit Agent */}
       <Sheet open={isOpen} onOpenChange={setOpen}>
-        <SheetContent>
+        <SheetContent className="overflow-y-auto">
           <SheetHeader>
             <SheetTitle>
               {editingAgent ? "Edit Agent Configuration" : "Create Agent Configuration"}
@@ -226,7 +261,7 @@ function IntegrationsPage() {
             </SheetDescription>
           </SheetHeader>
           
-          <FieldSet className='px-4'>
+          <FieldSet className='px-4 mt-4'>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="name">Agent Name</FieldLabel>
@@ -286,10 +321,49 @@ function IntegrationsPage() {
                   disabled={isSubmitting}
                 />
               </Field>
+
+              {/* Webhook Configuration Section */}
+              <div className="pt-4 border-t space-y-4">
+                <span className="text-sm font-semibold text-foreground block">Webhook Configuration</span>
+
+                <Field>
+                  <FieldLabel htmlFor="target_url">Webhook Target URL</FieldLabel>
+                  <FieldDescription>
+                    URL where event notifications for this agent will be sent.
+                  </FieldDescription>
+                  <Input 
+                    id="target_url" 
+                    autoComplete="off" 
+                    placeholder="http://localhost:4500/webhook/callback" 
+                    value={webhookUrl}
+                    onChange={(e) => setWebhookUrl(e.target.value)}
+                    disabled={isSubmitting}
+                  />
+                </Field>
+
+                <Field>
+                  <FieldLabel htmlFor="event_type">Event Type</FieldLabel>
+                  <Input 
+                    id="event_type" 
+                    value={eventType}
+                    disabled
+                    className="bg-muted text-muted-foreground cursor-not-allowed"
+                  />
+                </Field>
+
+                <Field orientation={"horizontal"}>
+                  <span className='font-sans font-medium'>Enable Webhook Notifications</span>
+                  <Switch 
+                    checked={webhookEnabled} 
+                    onCheckedChange={setWebhookEnabled} 
+                    disabled={isSubmitting}
+                  />
+                </Field>
+              </div>
             </FieldGroup>
           </FieldSet>
 
-          <SheetFooter className="mt-6">
+          <SheetFooter className="mt-6 mb-4">
             {(!editingAgent || isDirty) && (
               <Button onClick={handleSubmit} disabled={isSubmitting}>
                 {isSubmitting ? (

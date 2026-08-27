@@ -31,11 +31,12 @@ function AgentList({ data, className, onEdit, onDelete, isLoading }: AgentListPr
             </TableCaption>
             <TableHeader className='bg-accent border rounded-2xl'>
                 <TableRow>
-                    <TableHead className="w-[15rem] border">Agent Name</TableHead>
+                    <TableHead className="w-[12rem] border">Agent Name</TableHead>
                     <TableHead className='w-[6rem] border'>Status</TableHead>
                     <TableHead className='border'>Target Folder</TableHead>
+                    <TableHead className='border'>Webhook Target</TableHead>
                     <TableHead className="w-[6rem] border">Scopes</TableHead>
-                    <TableHead className='w-[10rem] border text-right'>Actions</TableHead>
+                    <TableHead className='w-[8rem] border text-right'>Actions</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -44,8 +45,15 @@ function AgentList({ data, className, onEdit, onDelete, isLoading }: AgentListPr
                     const name = item.name || "Unnamed Agent";
                     const target = item.path || item.target || item.targetFolder || "/";
                     const scopes = item.scopes || item.scope || "r";
-                    const isActive = item.isActive !== undefined ? item.isActive : item.active !== undefined ? item.active : true;
+                    const isActive = item.enabled !== undefined && item.enabled !== null
+                        ? item.enabled
+                        : item.isActive !== undefined
+                        ? item.isActive
+                        : item.active !== undefined
+                        ? item.active
+                        : true;
 
+                    const webhookUrl = item.target_url || item.webhook?.target_url;
 
                     return (
                         <TableRow key={agentId}>
@@ -62,7 +70,11 @@ function AgentList({ data, className, onEdit, onDelete, isLoading }: AgentListPr
                                 )}
                             </TableCell>
                             <TableCell className='border'>{target}</TableCell>
+                            <TableCell className='border text-xs font-mono text-muted-foreground max-w-[15rem] truncate'>
+                                {webhookUrl ? webhookUrl : <span className="text-muted-foreground/50 italic">None</span>}
+                            </TableCell>
                             <TableCell className="border"><Badge variant="secondary">{scopes}</Badge></TableCell>
+
                             <TableCell className='flex justify-end gap-3 items-center border'>
                                 <Button 
                                     size={"icon-sm"} 
