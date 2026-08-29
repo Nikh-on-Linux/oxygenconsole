@@ -21,6 +21,9 @@ function FileBox({ filename = "SampleFile very big text..tx and someh", fileid =
     const handleMoveFile = ()=>{
         router.push(`?mt=${filename}`);
     }
+    const handleDeleteFile = ()=>{
+        router.push(`?defi=${fileid}`);
+    }
     return (
         <div className='w-37 aspect-square  py-2 group hover:bg-accent/50 rounded-lg ' >
             <ContextMenu>
@@ -47,7 +50,7 @@ function FileBox({ filename = "SampleFile very big text..tx and someh", fileid =
                     </ContextMenuGroup>
                     <ContextMenuSeparator />
                     <ContextMenuGroup>
-                        <ContextMenuItem>
+                        <ContextMenuItem onClick={handleDeleteFile}>
                             <span className='text-destructive' >Delete</span>
                         </ContextMenuItem>
                     </ContextMenuGroup>

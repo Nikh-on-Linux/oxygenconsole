@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createNewFolder, getFolderContents } from "@/lib/api/folders";
-import { moveFile } from "@/lib/api/file";
+import { moveFile, deleteFile } from "@/lib/api/file";
 import type { FolderContents } from "@/lib/types/folder";
 import { BaseApiResponse } from "../types/base";
 
@@ -15,6 +15,7 @@ interface FileState {
   fetchFolder: (folderId: string) => Promise<void>;
   createFolder: (pathstring: String, foldername: String) => Promise<void>;
   moveFile: (filename: string, sourcePath: string, destinationPath: string) => Promise<void>;
+  deleteFile: (filename: string, sourcePath: string) => Promise<void>;
 }
 
 const emptyFolderContents: FolderContents = {
@@ -98,6 +99,37 @@ export const useFileStore = create<FileState>((set) => ({
         subLoading: false,
         subError: err.message
       })
+    }
+  },
+
+  deleteFile: async (filename: string, sourcePath: string) => {
+    set({
+      subLoading: true,
+      subError: null
+    })
+    try {
+      const response: BaseApiResponse = await deleteFile(filename, sourcePath);
+
+      if (!response.suc) {
+        set({
+          subLoading: false,
+          subError: response.message
+        })
+        return;
+      }
+
+      set({
+        subLoading: false,
+        subResponse: { message: response.message }
+      })
+    }
+    catch (error) {
+      if (error instanceof Error) {
+        set({
+          subError: error.message,
+          subLoading: false
+        })
+      }
     }
   }
 }));

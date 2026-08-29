@@ -10,3 +10,14 @@ export async function moveFile(filename: string, sourcePath: string, destination
 
     return response.data
 }
+
+export async function deleteFile(filename:string, path:string): Promise<BaseApiResponse>{
+    console.log(filename,path)
+    const reponse = await apiClient.delete(`/user/file/${filename}`,{
+        data:{
+            path:path
+        }
+    })
+
+    return reponse.data;
+}
