@@ -9,7 +9,7 @@ interface AgentState {
   
   // Actions
   fetchAgents: () => Promise<void>;
-  addAgent: (data: CreateAgentDTO) => Promise<{ success: boolean; agent?: Agent; apiKey?: string }>;
+  addAgent: (data: CreateAgentDTO) => Promise<{ success: boolean; agent?: Agent; apiKey?: string; message?: string }>;
   editAgent: (id: string, data: UpdateAgentDTO) => Promise<boolean>;
   removeAgent: (id: string) => Promise<boolean>;
 }
@@ -39,19 +39,29 @@ export const useAgentStore = create<AgentState>((set, get) => ({
       await get().fetchAgents();
 
       const extractedApiKey =
+        res?.apikey ||
         res?.apiKey ||
         res?.api_key ||
         res?.key ||
+        res?.token ||
+        res?.secret ||
+        res?.agent?.apikey ||
         res?.agent?.apiKey ||
         res?.agent?.api_key ||
-        res?.data?.apiKey ||
-        res?.data?.api_key ||
         null;
 
+      const isSuccess =
+        res?.suc !== undefined
+          ? Boolean(res.suc)
+          : res?.success !== undefined
+          ? Boolean(res.success)
+          : true;
+
       return {
-        success: true,
+        success: isSuccess,
         agent: res?.agent || res?.data,
         apiKey: extractedApiKey,
+        message: res?.message,
       };
     } catch (err: unknown) {
       set({

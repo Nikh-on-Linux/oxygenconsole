@@ -201,12 +201,15 @@ function IntegrationsPage() {
           webhook: webhookPayload,
         });
         if (res.success) {
-          toast.success("Agent created successfully");
+          toast.success(res.message || "Agent created successfully");
           setOpen(false);
-          const keyToShow = res.apiKey || "API Key generated successfully (Check response headers/payload)";
-          setCreatedApiKey(keyToShow);
-          setHasCopied(false);
-          setKeyDialogOpen(true);
+          if (res.apiKey) {
+            setCreatedApiKey(res.apiKey);
+            setHasCopied(false);
+            setKeyDialogOpen(true);
+          } else {
+            toast.warning("Agent created, but no API key was returned by the server.");
+          }
         } else {
           toast.error("Failed to create agent");
         }

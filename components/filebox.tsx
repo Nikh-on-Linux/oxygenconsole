@@ -1,6 +1,8 @@
+"use client"
 import { FileIcon, MoreVerticalIcon } from 'lucide-react'
 import React from 'react'
 import { Button } from './ui/button'
+import { useRouter } from 'next/navigation'
 import {
     ContextMenu,
     ContextMenuContent,
@@ -15,6 +17,10 @@ import {
 } from "@/components/ui/context-menu"
 
 function FileBox({ filename = "SampleFile very big text..tx and someh", fileid = "", filetype = "txt" }) {
+    const router = useRouter();
+    const handleMoveFile = ()=>{
+        router.push(`?mt=${filename}`);
+    }
     return (
         <div className='w-37 aspect-square  py-2 group hover:bg-accent/50 rounded-lg ' >
             <ContextMenu>
@@ -36,7 +42,7 @@ function FileBox({ filename = "SampleFile very big text..tx and someh", fileid =
                     <ContextMenuSeparator /> 
                     <ContextMenuGroup>
                         <ContextMenuItem>Download</ContextMenuItem>
-                        <ContextMenuItem>Move to</ContextMenuItem>
+                        <ContextMenuItem onClick={handleMoveFile} >Move to</ContextMenuItem>
                         <ContextMenuItem>Rename</ContextMenuItem>
                     </ContextMenuGroup>
                     <ContextMenuSeparator />
