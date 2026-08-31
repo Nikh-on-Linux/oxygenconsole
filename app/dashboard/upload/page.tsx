@@ -2,13 +2,9 @@
 
 import { useRef } from "react";
 
-import {
-  Button,
-} from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 
-import {
-  PlusIcon,
-} from "lucide-react";
+import { PlusIcon } from "lucide-react";
 
 import {
   useUploadStore,
@@ -49,27 +45,60 @@ function UploadPage() {
     );
 
 
+  const startUploads =
+    useUploadStore(
+      (state) => state.startUploads
+    );
+
+
   function handleInputChange(
     event:
       React.ChangeEvent<HTMLInputElement>
   ) {
 
-    const selectedFile =
-      event.target.files?.[0];
+    const selectedFiles =
+      event.target.files;
 
 
-    if (!selectedFile) {
+    if (!selectedFiles) {
       return;
     }
 
 
     /*
-     * Create a NEW upload record.
+     * Store the IDs of all newly
+     * created upload records.
      */
-    selectFile(
-      selectedFile,
-      currentPath
+    const uploadIds: string[] = [];
+
+
+    /*
+     * Create one independent upload
+     * record for every selected file.
+     */
+    Array.from(selectedFiles).forEach(
+      (selectedFile) => {
+
+        const id =
+          selectFile(
+            selectedFile,
+            currentPath
+          );
+
+
+        uploadIds.push(id);
+      }
     );
+
+
+    /*
+     * Send all newly created uploads
+     * to the client-side scheduler.
+     *
+     * The scheduler decides how many
+     * can run simultaneously.
+     */
+    startUploads(uploadIds);
 
 
     /*
@@ -100,12 +129,13 @@ function UploadPage() {
 
 
     /*
-     * Reset input so the same file can be
-     * selected again later.
+     * Reset input so the same file can
+     * be selected again later.
      */
     if (
       inputFileRef.current
     ) {
+
       inputFileRef.current.value =
         "";
     }
@@ -113,14 +143,37 @@ function UploadPage() {
 
 
   return (
-    <section className="w-full px-4 flex items-center justify-center overflow-y-auto">
+    <section
+      className="
+        w-full
+        px-4
+        flex
+        items-center
+        justify-center
+        overflow-y-auto
+      "
+    >
 
-      <div className="lg:max-w-[60rem] w-full aspect-video flex items-center justify-center border-border border-2 border-dashed rounded-lg">
+      <div
+        className="
+          lg:max-w-[60rem]
+          w-full
+          aspect-video
+          flex
+          items-center
+          justify-center
+          border-border
+          border-2
+          border-dashed
+          rounded-lg
+        "
+      >
 
         <input
           ref={inputFileRef}
           type="file"
           className="hidden"
+          multiple
           onChange={
             handleInputChange
           }
@@ -132,6 +185,7 @@ function UploadPage() {
             inputFileRef.current?.click()
           }
         >
+
           <PlusIcon />
 
           <span>
@@ -145,5 +199,6 @@ function UploadPage() {
     </section>
   );
 }
+
 
 export default UploadPage;
