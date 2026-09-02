@@ -177,9 +177,9 @@ function NewDialogue() {
 
   }, [
     response,
-    router,
-    currentPath,
-    foldername,
+    // router,
+    // currentPath,
+    // foldername,
   ]);
 
 

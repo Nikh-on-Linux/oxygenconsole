@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTopPanelStore } from "@/lib/store/TopPanelStore";
+import { useNavigationStore } from "@/lib/store/mediaStore";
 
 function StatusBar() {
   const action = useTopPanelStore((state) => state.action);
@@ -16,7 +17,7 @@ function StatusBar() {
   const isNested = useTopPanelStore(
     (state) => state.isNested
   );
-  const backPath = useTopPanelStore(
+  const backPath = useNavigationStore(
     (state) => state.backPath
   );
 

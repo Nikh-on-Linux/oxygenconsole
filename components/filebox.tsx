@@ -1,5 +1,5 @@
 "use client"
-import { FileIcon, MoreVerticalIcon } from 'lucide-react'
+import { FileIcon, FileTextIcon, FileX2, MoreVerticalIcon } from 'lucide-react'
 import React from 'react'
 import { Button } from './ui/button'
 import { useRouter } from 'next/navigation'
@@ -14,21 +14,31 @@ import {
     ContextMenuSubContent,
     ContextMenuSubTrigger,
     ContextMenuTrigger,
-} from "@/components/ui/context-menu"
+} from "@/components/ui/context-menu";
+import { useTopPanelStore } from '@/lib/store/TopPanelStore';
+import { useNavigationStore } from '@/lib/store/mediaStore'
 
 function FileBox({ filename = "SampleFile very big text..tx and someh", fileid = "", filetype = "txt" }) {
+    const { currentPath } = useTopPanelStore();
+    const { setBackPath } = useNavigationStore();
     const router = useRouter();
-    const handleMoveFile = ()=>{
+    const handleMoveFile = () => {
         router.push(`?mt=${filename}`);
     }
-    const handleDeleteFile = ()=>{
+    const handleDeleteFile = () => {
         router.push(`?defi=${fileid}`);
     }
+    const handleFileOpen = () => {
+        setBackPath(`/dashboard/myair/${currentPath}`);
+        router.push(`/dashboard/media/${fileid}`);
+    }
     return (
-        <div className='w-37 aspect-square  py-2 group hover:bg-accent/50 rounded-lg ' >
+        <div className='w-37 aspect-square  py-2 group hover:bg-accent/50 rounded-lg ' onDoubleClick={handleFileOpen} >
             <ContextMenu>
-                <ContextMenuTrigger className={"flex relative flex-col items-center gap-3"}>
-                    <FileIcon className='w-[5rem] h-[5rem] stroke-1 text-muted-foreground' />
+                <ContextMenuTrigger className={"flex relative flex-col items-center justify-center gap-6 h-full"}>
+                    <div className='w-fit px-2 aspect-square flex items-center justify-center rounded-xl bg-accent' >
+                        <FileTextIcon className='w-6 h-6 stroke-1 text-muted-foreground' />
+                    </div>
                     <span className='font-sans  max-w-full line-clamp-2 text-center'>{filename}</span>
                 </ContextMenuTrigger>
                 <ContextMenuContent className={"data-[starting-style]:opacity-0 data-[starting-style]:scale-95 data-[ending-style]:opacity-0 data-[ending-style]:scale-95 transition duration-150"}>
@@ -42,7 +52,7 @@ function FileBox({ filename = "SampleFile very big text..tx and someh", fileid =
                             </ContextMenuSubContent>
                         </ContextMenuSub>
                     </ContextMenuGroup>
-                    <ContextMenuSeparator /> 
+                    <ContextMenuSeparator />
                     <ContextMenuGroup>
                         <ContextMenuItem>Download</ContextMenuItem>
                         <ContextMenuItem onClick={handleMoveFile} >Move to</ContextMenuItem>

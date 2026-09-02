@@ -6,6 +6,8 @@ export interface Folder {
 export interface File {
   file_id: string;
   filename: string;
+  mimetype:string;
+  encoding:string;
 }
 
 export interface FolderContents {

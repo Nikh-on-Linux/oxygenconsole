@@ -7,6 +7,7 @@ import NewItemButton from "@/components/newItem";
 import NewDialogue from "@/components/newitemdialogue";
 import { useFileStore } from "@/lib/store/FolderFileStore";
 import { useTopPanelStore } from "@/lib/store/TopPanelStore";
+import { useNavigationStore } from "@/lib/store/mediaStore";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
 
@@ -32,6 +33,7 @@ function DirectoryPage() {
 
   useEffect(() => {
     const topPanel = useTopPanelStore.getState();
+    const navigationStore = useNavigationStore.getState();
 
     const currentFolderName =
       currentPath.at(-1) ?? "My Air";
@@ -42,7 +44,7 @@ function DirectoryPage() {
     topPanel.setAction(<NewItemButton />)
 
     if (currentPath.length > 0) {
-      topPanel.setBackPath(
+      navigationStore.setBackPath(
         calculateBackPath(currentPath)
       );
     }
@@ -68,7 +70,7 @@ function DirectoryPage() {
         ))}
         {items.files.map((file, key) => {
           return (
-            <FileBox key={key} filename={file.filename} fileid={file.file_id} />
+            <FileBox key={key} filetype={file.mimetype} filename={file.filename} fileid={file.file_id} />
           )
         })}
       </DirectoryWindow>
