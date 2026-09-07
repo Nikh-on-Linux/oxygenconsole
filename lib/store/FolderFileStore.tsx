@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { createNewFolder, getFolderContents } from "@/lib/api/folders";
+import { createNewFolder, getFolderContents, setFolderName, moveFolderLocation } from "@/lib/api/folders";
 import { moveFile, deleteFile } from "@/lib/api/file";
 import type { FolderContents } from "@/lib/types/folder";
 import { BaseApiResponse } from "../types/base";
@@ -14,6 +14,8 @@ interface FileState {
   subResponse: BaseApiResponse;
   fetchFolder: (folderId: string) => Promise<void>;
   createFolder: (pathstring: String, foldername: String) => Promise<void>;
+  renameFolder: (foldername: string, sourcePath: string) => Promise<void>;
+  moveFolder: (destinationPath: string, folderId: string) => Promise<void>;
   moveFile: (filename: string, sourcePath: string, destinationPath: string) => Promise<void>;
   deleteFile: (filename: string, sourcePath: string) => Promise<void>;
 }
@@ -30,7 +32,7 @@ export const useFileStore = create<FileState>((set) => ({
   error: null,
   subLoading: false,
   subError: null,
-  subResponse: {},
+  subResponse: {message:"", suc:false},
 
   fetchFolder: async (folderId: string) => {
     set({
@@ -75,7 +77,8 @@ export const useFileStore = create<FileState>((set) => ({
   moveFile: async (filename: string, sourcePath: string, destinationPath: string) => {
     set({
       subLoading: true,
-      subError: null
+      subError:null,
+      subResponse: {}
     })
 
     try {
@@ -105,7 +108,8 @@ export const useFileStore = create<FileState>((set) => ({
   deleteFile: async (filename: string, sourcePath: string) => {
     set({
       subLoading: true,
-      subError: null
+      subError:null,
+      subResponse: {message:"", suc:false}
     })
     try {
       const response: BaseApiResponse = await deleteFile(filename, sourcePath);
@@ -131,5 +135,31 @@ export const useFileStore = create<FileState>((set) => ({
         })
       }
     }
+  },
+
+  renameFolder: async (foldername: string, sourcePath: string) => {
+    set({
+      subLoading: true,
+      subError:null,
+      subResponse: {message:"", suc:false}
+    })
+    const response = await setFolderName(foldername, sourcePath);
+    set({
+      subLoading: false,
+      subResponse: { message: response.message, suc: response.suc }
+    })
+  },
+
+  moveFolder: async (destinationPath: string, folderId: string) => {
+    set({
+      subLoading: true,
+      subError:null,
+      subResponse: {message:"", suc:false}
+    })
+    const res = await moveFolderLocation(destinationPath, folderId);
+    set({
+      subLoading: false,
+      subResponse: { message: res.message, suc: res.suc }
+    })
   }
 }));

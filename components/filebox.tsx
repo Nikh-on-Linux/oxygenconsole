@@ -46,7 +46,7 @@ function FileBox({ filename = "SampleFile very big text..tx and someh", fileid =
                         <ContextMenuSub>
                             <ContextMenuSubTrigger>Open</ContextMenuSubTrigger>
                             <ContextMenuSubContent>
-                                <ContextMenuItem>Open</ContextMenuItem>
+                                <ContextMenuItem onClick={handleFileOpen} >Open</ContextMenuItem>
                                 <ContextMenuItem>Open in new Tab</ContextMenuItem>
                                 <ContextMenuItem>Open in new Window</ContextMenuItem>
                             </ContextMenuSubContent>
