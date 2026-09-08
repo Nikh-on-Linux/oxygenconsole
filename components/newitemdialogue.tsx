@@ -41,6 +41,7 @@ import {
 import {
   Loader2Icon,
 } from "lucide-react";
+import { toast } from "sonner";
 
 
 interface ResponseInterface {
@@ -89,6 +90,10 @@ function NewDialogue() {
         state.response
     );
 
+  const resetResponse = useFileStore(
+    (state)=>
+      state.resetResponse
+  );
 
   const isLoading =
     useFileStore(
@@ -160,9 +165,7 @@ function NewDialogue() {
 
     if (response?.suc) {
 
-      alert(
-        response.message
-      );
+      toast.success(response.message);
 
 
       setFolderDialogue(
@@ -174,6 +177,8 @@ function NewDialogue() {
         `/dashboard/myair${currentPath}/${foldername}`
       );
     }
+
+    return ()=>resetResponse();
 
   }, [
     response,

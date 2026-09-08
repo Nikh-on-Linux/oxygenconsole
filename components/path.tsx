@@ -192,10 +192,11 @@ function PathNavigation() {
             className="rounded-xl border bg-card px-4 py-1.5 transition-all"
         >
             {!isEditing ? (
-                <Breadcrumb>
-                    <BreadcrumbList>
+                <Breadcrumb className="w-full">
+                    <BreadcrumbList className="flex-nowrap overflow-hidden">
+
                         {/* Directory root */}
-                        <BreadcrumbItem>
+                        <BreadcrumbItem className="shrink-0">
                             {directoryPath.length === 0 ? (
                                 <BreadcrumbPage>/</BreadcrumbPage>
                             ) : (
@@ -211,35 +212,131 @@ function PathNavigation() {
                             )}
                         </BreadcrumbItem>
 
-                        {/* Directory children */}
-                        {breadcrumbItems.map(
-                            ({
-                                segment,
-                                route,
-                                isCurrent,
-                            }) => (
-                                <React.Fragment key={route}>
-                                    <BreadcrumbSeparator />
+                        {directoryPath.length > 0 && (
+                            <>
+                                <BreadcrumbSeparator className="shrink-0" />
 
-                                    <BreadcrumbItem>
-                                        {isCurrent ? (
-                                            <BreadcrumbPage>
-                                                {formatName(segment)}
-                                            </BreadcrumbPage>
-                                        ) : (
+                                {/*
+                     * Show the normal breadcrumb when the path
+                     * is short enough.
+                     *
+                     * Example:
+                     * / > workspace > project > src
+                     */}
+                                {directoryPath.length <= 3 ? (
+                                    breadcrumbItems.map(
+                                        ({
+                                            segment,
+                                            route,
+                                            isCurrent,
+                                        }) => (
+                                            <React.Fragment key={route}>
+                                                <BreadcrumbItem className="shrink-0">
+                                                    {isCurrent ? (
+                                                        <BreadcrumbPage>
+                                                            {formatName(segment)}
+                                                        </BreadcrumbPage>
+                                                    ) : (
+                                                        <BreadcrumbLink
+                                                            href={route}
+                                                            onClick={(event) => {
+                                                                event.preventDefault();
+                                                                router.push(route);
+                                                            }}
+                                                        >
+                                                            {formatName(segment)}
+                                                        </BreadcrumbLink>
+                                                    )}
+                                                </BreadcrumbItem>
+
+                                                {!isCurrent && (
+                                                    <BreadcrumbSeparator className="shrink-0" />
+                                                )}
+                                            </React.Fragment>
+                                        )
+                                    )
+                                ) : (
+                                    <>
+                                        {/*
+                             * Collapsed intermediate paths
+                             *
+                             * Example:
+                             *
+                             * / > ... > src > components
+                             *
+                             * The "..." represents everything
+                             * between the root and the visible tail.
+                             */}
+                                        <BreadcrumbItem className="shrink-0">
                                             <BreadcrumbLink
-                                                href={route}
+                                                href={getRouteFromDirectoryPath(
+                                                    directoryPath.slice(
+                                                        0,
+                                                        directoryPath.length - 2
+                                                    )
+                                                )}
                                                 onClick={(event) => {
                                                     event.preventDefault();
-                                                    router.push(route);
+
+                                                    const parentPath =
+                                                        directoryPath.slice(
+                                                            0,
+                                                            directoryPath.length - 2
+                                                        );
+
+                                                    router.push(
+                                                        getRouteFromDirectoryPath(
+                                                            parentPath
+                                                        )
+                                                    );
                                                 }}
                                             >
-                                                {formatName(segment)}
+                                                ...
                                             </BreadcrumbLink>
-                                        )}
-                                    </BreadcrumbItem>
-                                </React.Fragment>
-                            )
+                                        </BreadcrumbItem>
+
+                                        <BreadcrumbSeparator className="shrink-0" />
+
+                                        {/*
+                             * Last two path elements remain visible.
+                             */}
+                                        {breadcrumbItems
+                                            .slice(-2)
+                                            .map(
+                                                ({
+                                                    segment,
+                                                    route,
+                                                    isCurrent,
+                                                }) => (
+                                                    <React.Fragment key={route}>
+                                                        <BreadcrumbItem className="shrink-0 min-w-0">
+                                                            {isCurrent ? (
+                                                                <BreadcrumbPage className="truncate">
+                                                                    {formatName(segment)}
+                                                                </BreadcrumbPage>
+                                                            ) : (
+                                                                <BreadcrumbLink
+                                                                    href={route}
+                                                                    onClick={(event) => {
+                                                                        event.preventDefault();
+                                                                        router.push(route);
+                                                                    }}
+                                                                    className="truncate"
+                                                                >
+                                                                    {formatName(segment)}
+                                                                </BreadcrumbLink>
+                                                            )}
+                                                        </BreadcrumbItem>
+
+                                                        {!isCurrent && (
+                                                            <BreadcrumbSeparator className="shrink-0" />
+                                                        )}
+                                                    </React.Fragment>
+                                                )
+                                            )}
+                                    </>
+                                )}
+                            </>
                         )}
                     </BreadcrumbList>
                 </Breadcrumb>
@@ -248,7 +345,7 @@ function PathNavigation() {
                     <span className="font-sans text-muted-foreground">myair:/</span>
                     <input
                         autoFocus
-                        value={inputPath}
+                        value={decodeURIComponent(inputPath)}
                         onChange={(event) =>
                             setInputPath(event.target.value)
                         }

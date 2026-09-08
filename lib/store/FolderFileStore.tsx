@@ -20,6 +20,7 @@ interface FileState {
   deleteFile: (filename: string, sourcePath: string) => Promise<void>;
   renameFile: (filename: string, sourcePath: string, newName: string) => Promise<void>;
   resetItems: ()=>void;
+  resetResponse: ()=>void;
 }
 
 const emptyFolderContents: FolderContents = {
@@ -180,5 +181,7 @@ export const useFileStore = create<FileState>((set) => ({
     })
   },
 
-  resetItems: ()=>{set({items:emptyFolderContents})}
+  resetItems: ()=>{set({items:emptyFolderContents})},
+
+  resetResponse: ()=>{set({response:null})}
 }));
