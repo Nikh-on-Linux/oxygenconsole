@@ -21,3 +21,12 @@ export async function deleteFile(filename:string, path:string): Promise<BaseApiR
 
     return reponse.data;
 }
+
+export async function setFileName(filename:string, sourcePath:string, newName:string): Promise<BaseApiResponse>{
+    const response = await apiClient.post(`/user/rename/file/${encodeURIComponent(filename)}`,{
+        sourcePath:sourcePath,
+        newName:newName
+    })
+
+    return response.data;
+}

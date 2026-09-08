@@ -388,7 +388,6 @@ function IntegrationsPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <KeyIcon className="h-5 w-5 text-amber-500" />
               <span>Save Your Agent API Key</span>
             </DialogTitle>
             <DialogDescription>

@@ -1,6 +1,6 @@
 "use client"
 import { FileIcon, FileTextIcon, FileX2, MoreVerticalIcon } from 'lucide-react'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from './ui/button'
 import { useRouter } from 'next/navigation'
 import {
@@ -17,10 +17,17 @@ import {
 } from "@/components/ui/context-menu";
 import { useTopPanelStore } from '@/lib/store/TopPanelStore';
 import { useNavigationStore } from '@/lib/store/mediaStore'
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog'
+import { Input } from '@/components/ui/input';
+import { useFileStore } from '@/lib/store/FolderFileStore'
+import { toast } from 'sonner'
 
 function FileBox({ filename = "SampleFile very big text..tx and someh", fileid = "", filetype = "txt" }) {
     const { currentPath } = useTopPanelStore();
     const { setBackPath } = useNavigationStore();
+    const [isRenameOpen, setRenameOpen] = useState(false);
+    const { renameFile, subLoading, subResponse } = useFileStore();
+    const [nameValue, setNameValue] = useState("");
     const router = useRouter();
     const handleMoveFile = () => {
         router.push(`?mt=${filename}`);
@@ -32,8 +39,36 @@ function FileBox({ filename = "SampleFile very big text..tx and someh", fileid =
         setBackPath(`/dashboard/myair/${currentPath}`);
         router.push(`/dashboard/media/${fileid}`);
     }
+
+    useEffect(() => {
+        if (subResponse.message && subResponse.suc) {
+            if (!subResponse.suc) {
+                toast.error(subResponse.message);
+                return;
+            }
+            toast.success(subResponse.message);
+        }
+    }, [subLoading])
+
+    const handleFileRename = async () => {
+        setRenameOpen(false);
+        toast.info("Renaming file");
+        await renameFile(filename, currentPath, nameValue);
+    }
     return (
         <div className='w-37 aspect-square  py-2 group hover:bg-accent/50 rounded-lg ' onDoubleClick={handleFileOpen} >
+            <Dialog open={isRenameOpen} onOpenChange={setRenameOpen} >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Rename File</DialogTitle>
+                    </DialogHeader>
+                    <Input placeholder='e.g, file123' onChange={(e) => setNameValue(e.target.value)} />
+                    <DialogFooter>
+                        <DialogClose render={<Button variant={"secondary"}>Cancel</Button>} />
+                        <Button onClick={handleFileRename} >Rename</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
             <ContextMenu>
                 <ContextMenuTrigger className={"flex relative flex-col items-center justify-center gap-6 h-full"}>
                     <div className='w-fit px-2 aspect-square flex items-center justify-center rounded-xl bg-accent' >
@@ -56,7 +91,7 @@ function FileBox({ filename = "SampleFile very big text..tx and someh", fileid =
                     <ContextMenuGroup>
                         <ContextMenuItem>Download</ContextMenuItem>
                         <ContextMenuItem onClick={handleMoveFile} >Move to</ContextMenuItem>
-                        <ContextMenuItem>Rename</ContextMenuItem>
+                        <ContextMenuItem onClick={() => setRenameOpen(true)}>Rename</ContextMenuItem>
                     </ContextMenuGroup>
                     <ContextMenuSeparator />
                     <ContextMenuGroup>

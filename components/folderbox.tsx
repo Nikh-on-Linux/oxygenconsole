@@ -34,7 +34,7 @@ function FolderBox({ foldername = "Sample Folder", folderid }: { foldername?: st
   const [isRenameOpen, setRenameOpen] = useState(false);
   const [isMoveOpen, setMoveOpen] = useState(false);
   const { currentPath } = useTopPanelStore();
-  const { renameFolder, subResponse, subLoading, moveFolder } = useFileStore();
+  const { renameFolder, subResponse, subLoading, moveFolder, resetItems } = useFileStore();
   useEffect(() => {
     setFolderPath(`${pathname}/${foldername}`);
   }, [pathname])
@@ -57,7 +57,7 @@ function FolderBox({ foldername = "Sample Folder", folderid }: { foldername?: st
     await renameFolder(nameValue, `${currentPath}/${foldername}`);
   }
 
-  async function handleFolderMove(){
+  async function handleFolderMove() {
     setMoveOpen(false);
     toast.info("Moving folder");
     await moveFolder(pathValue, `${folderid}`);
@@ -90,7 +90,10 @@ function FolderBox({ foldername = "Sample Folder", folderid }: { foldername?: st
       </Dialog>
       <ContextMenu>
         <ContextMenuTrigger>
-          <div onClick={() => { router.push(folderpath) }} className='group max-w-42 hover:border-foreground/20 flex flex-col justify-between overflow-hidden transition-all duration-200 select-none relative px-4 py-4 aspect-square w-full bg-card rounded-xl border border-border/50' >
+          <div onClick={() => {
+            resetItems();
+            router.push(folderpath);
+          }} className='group max-w-42 hover:border-foreground/20 flex flex-col justify-between overflow-hidden transition-all duration-200 select-none relative px-4 py-4 aspect-square w-full bg-card rounded-xl border border-border/50' >
             <FolderIcon className='w-40 z-0 h-40 absolute opacity-50 -bottom-12 -right-8 stroke-[0.5] text-foreground/10 transition-all group-hover:-bottom-10 group-hover:-right-6 group-hover:text-foreground/20' />
             <div className='flex items-center justify-between' >
               <div className='bg-accent w-fit aspect-square px-2 flex items-center justify-center rounded-xl' >
