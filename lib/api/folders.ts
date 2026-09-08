@@ -38,3 +38,13 @@ export async function moveFolderLocation(destinationPath: string, folderId: stri
 
   return res.data;
 }
+
+export async function removeFolder(currentFolderPath: string): Promise<BaseApiResponse> {
+  const response = await apiClient.delete('/user/folder',{
+    data:{
+      path:currentFolderPath
+    }
+  })
+
+  return response.data;
+}

@@ -33,23 +33,12 @@ function FolderBox({ foldername = "Sample Folder", folderid }: { foldername?: st
   const [pathValue, setPathValue] = useState("");
   const [isRenameOpen, setRenameOpen] = useState(false);
   const [isMoveOpen, setMoveOpen] = useState(false);
+  const [isDeleteOpen, setDeleteOpen] = useState(false);
   const { currentPath } = useTopPanelStore();
-  const { renameFolder, subResponse, subLoading, moveFolder, resetItems } = useFileStore();
+  const { renameFolder, subResponse, subLoading, moveFolder, resetItems, deleteFolder, resetSubresponse } = useFileStore();
   useEffect(() => {
     setFolderPath(`${pathname}/${foldername}`);
   }, [pathname])
-
-  useEffect(() => {
-    if (subResponse.message && subResponse.suc) {
-      if (!subResponse.suc) {
-        toast.error(subResponse.message);
-        return;
-      }
-
-      toast.success(subResponse.message);
-    }
-
-  }, [subLoading])
 
   async function handleRenameFolder() {
     setRenameOpen(false);
@@ -62,6 +51,12 @@ function FolderBox({ foldername = "Sample Folder", folderid }: { foldername?: st
     toast.info("Moving folder");
     await moveFolder(pathValue, `${folderid}`);
   }
+
+  async function handleDeleteFolder(){
+    setDeleteOpen(false);
+    toast.info("Folder deletion in progress");
+    await deleteFolder(`${currentPath}/${foldername}`);
+  }
   return (
     <>
       <Dialog open={isRenameOpen} onOpenChange={setRenameOpen} >
@@ -73,6 +68,19 @@ function FolderBox({ foldername = "Sample Folder", folderid }: { foldername?: st
           <DialogFooter>
             <DialogClose render={<Button variant={"secondary"}>Cancel</Button>} />
             <Button onClick={handleRenameFolder} >Rename</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isDeleteOpen} onOpenChange={setDeleteOpen} >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Folder</DialogTitle>
+            <DialogDescription>All sub folders and files present inside this folder will be deleted and cannot be recovered again.</DialogDescription>
+          </DialogHeader>
+          {/* <Input placeholder='e.g, myfolder' onChange={(e) => setNameValue(e.target.value)} /> */}
+          <DialogFooter>
+            <DialogClose render={<Button variant={"secondary"}>Cancel</Button>} />
+            <Button variant={"destructive"} onClick={handleDeleteFolder} >I understand, Delete folder</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -108,7 +116,7 @@ function FolderBox({ foldername = "Sample Folder", folderid }: { foldername?: st
           <ContextMenuItem onClick={() => setRenameOpen(true)}>Rename</ContextMenuItem>
           <ContextMenuItem onClick={() => setMoveOpen(true)}>Move to</ContextMenuItem>
           <ContextMenuSeparator />
-          <ContextMenuItem >
+          <ContextMenuItem onClick={() => setDeleteOpen(true)} >
             <span className='text-destructive' >Delete</span>
           </ContextMenuItem>
         </ContextMenuContent>

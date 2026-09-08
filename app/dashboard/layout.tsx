@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/sidebar"
 import StatusBar from '@/components/statusbar';
 import UploadBar from '@/components/uploadbar';
+import ProcessIndicator from '@/components/processIndicator';
 
 
 function Dashboardlayout({ children }: { children: React.ReactNode }) {
@@ -28,6 +29,7 @@ function Dashboardlayout({ children }: { children: React.ReactNode }) {
                     <StatusBar />
                     {children}
                     <UploadBar />
+                    <ProcessIndicator />
                 </main>
             </SidebarInset>
         </SidebarProvider>

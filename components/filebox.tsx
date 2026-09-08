@@ -40,15 +40,15 @@ function FileBox({ filename = "SampleFile very big text..tx and someh", fileid =
         router.push(`/dashboard/media/${fileid}`);
     }
 
-    useEffect(() => {
-        if (subResponse.message && subResponse.suc) {
-            if (!subResponse.suc) {
-                toast.error(subResponse.message);
-                return;
-            }
-            toast.success(subResponse.message);
-        }
-    }, [subLoading])
+    // useEffect(() => {
+    //     if (subResponse.message && subResponse.suc) {
+    //         if (!subResponse.suc) {
+    //             toast.error(subResponse.message);
+    //             return;
+    //         }
+    //         toast.success(subResponse.message);
+    //     }
+    // }, [subLoading])
 
     const handleFileRename = async () => {
         setRenameOpen(false);

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { createNewFolder, getFolderContents, setFolderName, moveFolderLocation } from "@/lib/api/folders";
+import { createNewFolder, getFolderContents, setFolderName, moveFolderLocation, removeFolder } from "@/lib/api/folders";
 import { moveFile, deleteFile, setFileName } from "@/lib/api/file";
 import type { FolderContents } from "@/lib/types/folder";
 import { BaseApiResponse } from "../types/base";
@@ -16,11 +16,13 @@ interface FileState {
   createFolder: (pathstring: String, foldername: String) => Promise<void>;
   renameFolder: (foldername: string, sourcePath: string) => Promise<void>;
   moveFolder: (destinationPath: string, folderId: string) => Promise<void>;
+  deleteFolder: (currentFolderPath: string) => Promise<void>;
   moveFile: (filename: string, sourcePath: string, destinationPath: string) => Promise<void>;
   deleteFile: (filename: string, sourcePath: string) => Promise<void>;
   renameFile: (filename: string, sourcePath: string, newName: string) => Promise<void>;
-  resetItems: ()=>void;
-  resetResponse: ()=>void;
+  resetItems: () => void;
+  resetResponse: () => void;
+  resetSubresponse : ()=>void;
 }
 
 const emptyFolderContents: FolderContents = {
@@ -181,7 +183,28 @@ export const useFileStore = create<FileState>((set) => ({
     })
   },
 
-  resetItems: ()=>{set({items:emptyFolderContents})},
+  resetItems: () => { set({ items: emptyFolderContents }) },
 
-  resetResponse: ()=>{set({response:null})}
+  resetResponse: () => { set({ response: null }) },
+
+  deleteFolder: async (currentFolderPath: string) => {
+    set({
+      subLoading: true,
+      subError: null,
+      subResponse: {}
+    })
+
+    const response = await removeFolder(currentFolderPath);
+
+    set({
+      subLoading: false,
+      subResponse: { message: response.message, suc: response.suc }
+    })
+  },
+
+  resetSubresponse: ()=> {
+    set({
+      subResponse:{}
+    })
+  },
 }));
