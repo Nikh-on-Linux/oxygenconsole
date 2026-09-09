@@ -30,6 +30,7 @@ function DirectoryPage() {
   const pathString = currentPath.join("/");
 
   const items = useFileStore((state) => state.items);
+  const subResponse = useFileStore((state)=>state.subResponse);
 
   useEffect(() => {
     const topPanel = useTopPanelStore.getState();
@@ -56,7 +57,7 @@ function DirectoryPage() {
     return () => {
       topPanel.reset();
     };
-  }, [pathString]);
+  }, [pathString,subResponse]);
 
   return (
     <section className="h-full w-full overflow-x-hidden overflow-y-auto px-4 py-2">

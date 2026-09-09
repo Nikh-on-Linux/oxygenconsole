@@ -7,6 +7,8 @@ import { CloudUploadIcon } from "lucide-react"
 import Panel from "@/components/panel"
 import FolderBox from "@/components/folderbox"
 import FileBox from "@/components/filebox"
+import { useUserInformationStore } from "@/lib/store/userStore"
+import DirectoryWindow from "@/components/directorywindow"
 
 
 export default function Page() {
@@ -23,41 +25,32 @@ export default function Page() {
     return () => useTopPanelStore.getState().reset()
   }, [])
 
-  const data = [
-    {
-      foldername: "Sample folder",
-      folderid: "1413524"
-    },
-    {
-      foldername: "Folder sample",
-      folderid: "1424"
-    },
-    {
-      foldername: "Another folder sample",
-      folderid: "1413245524"
-    }
-  ]
+  const { dashboardItems } = useUserInformationStore();
 
   return (
-    <section className="px-4" >
-      <Panel title={"Recent Folders"} className={"mt-4"}>
-        {
-          data.map((item,key)=>{
-            return(
-              <FolderBox key={key} folderid={item.folderid} foldername={item.foldername} />
-            )
-          })
-        }
+    <section className="px-4 w-full" >
+      <Panel title={"Recent Folders"} className={"w-full"}>
+        <DirectoryWindow>
+          {
+            dashboardItems?.folders?.map((item, key) => {
+              return (
+                <FolderBox key={key} folderid={item.folder_id} foldername={item.folder_name} />
+              )
+            })
+          }
+        </DirectoryWindow>
       </Panel>
-      <Panel title={"Recent Files"} className={"mt-10"} >
-        {
-          data.map((item,key)=>{
-            return(
-              <FileBox key={key} filename={item.foldername} fileid={item.folderid} />
-            )
-          })
-        }
-        </Panel>
+      <Panel title={"Recent Files"} className={"w-full"} >
+        <DirectoryWindow>
+          {
+            dashboardItems?.files?.map((item, key) => {
+              return (
+                <FileBox key={key} filename={item.filename} fileid={item.file_id} />
+              )
+            })
+          }
+        </DirectoryWindow>
+      </Panel>
     </section>
   )
 }

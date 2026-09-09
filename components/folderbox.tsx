@@ -55,7 +55,7 @@ function FolderBox({ foldername = "Sample Folder", folderid }: { foldername?: st
   async function handleDeleteFolder(){
     setDeleteOpen(false);
     toast.info("Folder deletion in progress");
-    await deleteFolder(`${currentPath}/${foldername}`);
+    await deleteFolder(`${folderid}`);
   }
   return (
     <>

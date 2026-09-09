@@ -284,132 +284,131 @@ function ImageViewer({
     }
   }
 
-  return (
-    <div className="relative flex w-full max-w-[80rem] overflow-hidden rounded-3xl bg-accent">
-
-      {/* ------------------------------------------------------------------ */}
-      {/* Loading                                                            */}
-      {/* ------------------------------------------------------------------ */}
-
-      {!loaded && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Loading image...
-          </div>
+return (
+  <div className="relative flex h-[75vh] w-full min-h-0 min-w-0 overflow-hidden rounded-3xl bg-accent">
+    
+    {/* Loading */}
+    {!loaded && (
+      <div className="absolute inset-0 z-20 flex items-center justify-center">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Loading image...
         </div>
-      )}
+      </div>
+    )}
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Controls                                                           */}
-      {/* ------------------------------------------------------------------ */}
+    {/* Controls */}
+    {loaded && (
+      <div className="absolute left-1/2 top-4 z-30 flex -translate-x-1/2 items-center gap-1 rounded-xl border border-border/50 bg-background/70 p-1 shadow-lg backdrop-blur-sm">
 
-      {loaded && (
-        <div className="absolute left-1/2 top-4 z-30 flex -translate-x-1/2 items-center gap-1 rounded-xl border border-border/50 bg-background/70 p-1 shadow-lg backdrop-blur-sm">
+        <button
+          type="button"
+          onClick={zoomOut}
+          disabled={zoom <= MIN_ZOOM}
+          className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-30"
+          aria-label="Zoom out"
+        >
+          <ZoomOutIcon className="h-4 w-4" />
+        </button>
 
-          <button
-            type="button"
-            onClick={zoomOut}
-            disabled={zoom <= MIN_ZOOM}
-            className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-30"
-            aria-label="Zoom out"
-          >
-            <ZoomOutIcon className="h-4 w-4" />
-          </button>
+        <button
+          type="button"
+          onClick={resetView}
+          className="flex h-9 min-w-16 items-center justify-center rounded-lg px-2 text-xs font-medium transition-colors hover:bg-accent"
+          aria-label="Reset zoom"
+        >
+          {Math.round(zoom * 100)}%
+        </button>
 
-          <button
-            type="button"
-            onClick={resetView}
-            className="flex h-9 min-w-16 items-center justify-center rounded-lg px-2 text-xs font-medium transition-colors hover:bg-accent"
-            aria-label="Reset zoom"
-          >
-            {Math.round(zoom * 100)}%
-          </button>
+        <button
+          type="button"
+          onClick={zoomIn}
+          disabled={zoom >= MAX_ZOOM}
+          className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-30"
+          aria-label="Zoom in"
+        >
+          <ZoomInIcon className="h-4 w-4" />
+        </button>
 
-          <button
-            type="button"
-            onClick={zoomIn}
-            disabled={zoom >= MAX_ZOOM}
-            className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-accent disabled:pointer-events-none disabled:opacity-30"
-            aria-label="Zoom in"
-          >
-            <ZoomInIcon className="h-4 w-4" />
-          </button>
+        <div className="mx-1 h-5 w-px bg-border" />
 
-          <div className="mx-1 h-5 w-px bg-border" />
+        <button
+          type="button"
+          onClick={resetView}
+          className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-accent"
+          aria-label="Reset view"
+        >
+          <RotateCcwIcon className="h-4 w-4" />
+        </button>
 
-          <button
-            type="button"
-            onClick={resetView}
-            className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-accent"
-            aria-label="Reset view"
-          >
-            <RotateCcwIcon className="h-4 w-4" />
-          </button>
+      </div>
+    )}
 
-        </div>
-      )}
-
-      {/* ------------------------------------------------------------------ */}
-      {/* Image viewport                                                     */}
-      {/* ------------------------------------------------------------------ */}
-
-      <div
-        ref={viewportRef}
-        className={`
-          relative flex h-full w-full items-center justify-center
-          overflow-hidden
-          touch-none
-          select-none
-          ${zoom > 1
+    {/* Image viewport */}
+    <div
+      ref={viewportRef}
+      className={`
+        relative flex
+        h-full w-full
+        min-h-0 min-w-0
+        items-center justify-center
+        overflow-hidden
+        touch-none select-none
+        ${
+          zoom > 1
             ? isDragging
               ? "cursor-grabbing"
               : "cursor-grab"
             : "cursor-default"
-          }
-        `}
-        onWheel={handleWheel}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
-        onDoubleClick={handleDoubleClick}
-      >
-        <img
-          src={src}
-          alt={filename}
-          draggable={false}
-          onLoad={() => setLoaded(true)}
-          onError={() => setError(true)}
-          className={`
-            max-h-full
-            max-w-full
-            select-none
-            object-contain
-            ${loaded
+        }
+      `}
+      onWheel={handleWheel}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      onDoubleClick={handleDoubleClick}
+    >
+      <img
+        src={src}
+        alt={filename}
+        draggable={false}
+        onLoad={() => setLoaded(true)}
+        onError={() => setError(true)}
+        className={`
+          block
+          h-auto
+          w-auto
+          max-h-full
+          max-w-full
+          object-contain
+          select-none
+          ${
+            loaded
               ? "opacity-100"
               : "opacity-0"
-            }
-            ${isDragging
+          }
+          ${
+            isDragging
               ? ""
               : "transition-transform duration-200"
-            }
-          `}
-          style={{
-            transform: `
-              translate3d(
-                ${position.x}px,
-                ${position.y}px,
-                0
-              )
-              scale(${zoom})
-            `,
-            transformOrigin: "center center",
-          }}
-        />
-      </div>
+          }
+        `}
+        style={{
+          transform: `
+            translate3d(
+              ${position.x}px,
+              ${position.y}px,
+              0
+            )
+            scale(${zoom})
+          `,
+          transformOrigin: "center center",
+        }}
+      />
     </div>
-  );
+  </div>
+);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -434,7 +433,7 @@ function VideoViewer({
   }
 
   return (
-    <div className="flex aspect-auto w-full items-center justify-center max-w-[90rem] rounded-2xl overflow-hidden bg-black">
+    <div className="flex aspect-auto items-center justify-center rounded-2xl overflow-hidden bg-black">
       <video
         src={src}
         controls

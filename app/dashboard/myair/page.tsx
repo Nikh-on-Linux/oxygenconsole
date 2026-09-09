@@ -8,6 +8,7 @@ import { useFileStore } from "@/lib/store/FolderFileStore";
 import { useTopPanelStore } from "@/lib/store/TopPanelStore";
 import { useEffect } from "react";
 import { useParams } from "next/navigation";
+import { useUserInformationStore } from "@/lib/store/userStore";
 
 function MyAir() {
   const items = useFileStore((state) => state.items);
@@ -42,6 +43,7 @@ function MyAir() {
             key={file.file_id}
             fileid={file.file_id}
             filename={file.filename}
+            filetype={file.mimetype}
           />
         ))}
       </DirectoryWindow>

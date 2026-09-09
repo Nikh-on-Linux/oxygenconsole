@@ -16,7 +16,8 @@ import {
   SidebarMenu
 } from "@/components/ui/sidebar"
 import { GalleryVerticalEndIcon, AudioLinesIcon, TerminalIcon, TerminalSquareIcon, BotIcon, BookOpenIcon, Settings2Icon, FrameIcon, PieChartIcon, MapIcon, SidebarIcon, HomeIcon, CloudIcon, WebhookIcon } from "lucide-react"
-import Link from "next/link"
+import Link from "next/link";
+import { useUserInformationStore } from "@/lib/store/userStore"
 
 // This is sample data.
 const data = {
@@ -46,6 +47,7 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { open } = useSidebar();
+  const { username, email } = useUserInformationStore();
   return (
     <Sidebar variant="sidebar" collapsible="icon" {...props}>
       <SidebarHeader>
@@ -72,7 +74,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser username={username} email={email} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

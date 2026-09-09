@@ -16,7 +16,7 @@ interface FileState {
   createFolder: (pathstring: String, foldername: String) => Promise<void>;
   renameFolder: (foldername: string, sourcePath: string) => Promise<void>;
   moveFolder: (destinationPath: string, folderId: string) => Promise<void>;
-  deleteFolder: (currentFolderPath: string) => Promise<void>;
+  deleteFolder: (folderId: string) => Promise<void>;
   moveFile: (filename: string, sourcePath: string, destinationPath: string) => Promise<void>;
   deleteFile: (filename: string, sourcePath: string) => Promise<void>;
   renameFile: (filename: string, sourcePath: string, newName: string) => Promise<void>;
@@ -187,14 +187,14 @@ export const useFileStore = create<FileState>((set) => ({
 
   resetResponse: () => { set({ response: null }) },
 
-  deleteFolder: async (currentFolderPath: string) => {
+  deleteFolder: async (folderId: string) => {
     set({
       subLoading: true,
       subError: null,
       subResponse: {}
     })
 
-    const response = await removeFolder(currentFolderPath);
+    const response = await removeFolder(folderId);
 
     set({
       subLoading: false,

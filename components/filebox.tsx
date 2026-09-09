@@ -1,5 +1,15 @@
 "use client"
-import { FileIcon, FileTextIcon, FileX2, MoreVerticalIcon } from 'lucide-react'
+import {
+    ArchiveIcon,
+    FileCodeIcon,
+    FileIcon,
+    FileJsonIcon,
+    FileTextIcon,
+    ImageIcon,
+    MusicIcon,
+    TableIcon,
+    VideoIcon,
+} from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Button } from './ui/button'
 import { useRouter } from 'next/navigation'
@@ -40,21 +50,88 @@ function FileBox({ filename = "SampleFile very big text..tx and someh", fileid =
         router.push(`/dashboard/media/${fileid}`);
     }
 
-    // useEffect(() => {
-    //     if (subResponse.message && subResponse.suc) {
-    //         if (!subResponse.suc) {
-    //             toast.error(subResponse.message);
-    //             return;
-    //         }
-    //         toast.success(subResponse.message);
-    //     }
-    // }, [subLoading])
 
     const handleFileRename = async () => {
         setRenameOpen(false);
         toast.info("Renaming file");
         await renameFile(filename, currentPath, nameValue);
     }
+
+    const handleFileOpenTab = () => {
+        setBackPath(`/dashboard/myair/${currentPath}`);
+        window.open(`${window.location.origin}/dashboard/media/${fileid}`, '_blank',);
+    }
+
+    const handleFileOpenWindow = () => {
+        setBackPath(`/dashboard/myair/${currentPath}`);
+        window.open(`${window.location.origin}/dashboard/media/${fileid}`, `MediaViewer ${filename}`, "width=1000,height=700,left=100,top=100,resizable=yes");
+    }
+
+
+    function getFileIcon(mimeType = "") {
+        if (mimeType.startsWith("image/")) {
+            return ImageIcon;
+        }
+
+        if (mimeType.startsWith("video/")) {
+            return VideoIcon;
+        }
+
+        if (mimeType.startsWith("audio/")) {
+            return MusicIcon;
+        }
+
+        // if (mimeType.startsWith("text/")) {
+        //     return FileTextIcon;
+        // }
+
+        switch (mimeType) {
+            // Documents
+            case "application/pdf":
+            case "application/msword":
+            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                return FileTextIcon;
+
+            // Spreadsheets
+            case "text/csv":
+            case "application/vnd.ms-excel":
+            case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+                return TableIcon;
+
+            // Presentations
+            case "application/vnd.ms-powerpoint":
+            case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+                return FileTextIcon;
+
+            // Code
+            case "application/javascript":
+            case "text/javascript":
+            case "application/typescript":
+            case "text/typescript":
+            case "text/css":
+            case "text/html":
+            case "application/x-httpd-php":
+                return FileCodeIcon;
+
+            // JSON
+            case "application/json":
+                return FileJsonIcon;
+
+            // Archives
+            case "application/zip":
+            case "application/x-rar-compressed":
+            case "application/x-7z-compressed":
+            case "application/gzip":
+            case "application/x-tar":
+                return ArchiveIcon;
+
+            default:
+                return FileIcon;
+        }
+    }
+
+    const FileTypeIcon = getFileIcon(filetype);
+
     return (
         <div className='w-37 aspect-square  py-2 group hover:bg-accent/50 rounded-lg ' onDoubleClick={handleFileOpen} >
             <Dialog open={isRenameOpen} onOpenChange={setRenameOpen} >
@@ -72,7 +149,7 @@ function FileBox({ filename = "SampleFile very big text..tx and someh", fileid =
             <ContextMenu>
                 <ContextMenuTrigger className={"flex relative flex-col items-center justify-center gap-6 h-full"}>
                     <div className='w-fit px-2 aspect-square flex items-center justify-center rounded-xl bg-accent' >
-                        <FileTextIcon className='w-6 h-6 stroke-1 text-muted-foreground' />
+                        <FileTypeIcon className='w-6 h-6 stroke-1 text-muted-foreground' />
                     </div>
                     <span className='font-sans  max-w-full line-clamp-2 text-center'>{filename}</span>
                 </ContextMenuTrigger>
@@ -82,14 +159,14 @@ function FileBox({ filename = "SampleFile very big text..tx and someh", fileid =
                             <ContextMenuSubTrigger>Open</ContextMenuSubTrigger>
                             <ContextMenuSubContent>
                                 <ContextMenuItem onClick={handleFileOpen} >Open</ContextMenuItem>
-                                <ContextMenuItem>Open in new Tab</ContextMenuItem>
-                                <ContextMenuItem>Open in new Window</ContextMenuItem>
+                                <ContextMenuItem onClick={handleFileOpenTab}>Open in new Tab</ContextMenuItem>
+                                <ContextMenuItem onClick={handleFileOpenWindow}>Open in new Window</ContextMenuItem>
                             </ContextMenuSubContent>
                         </ContextMenuSub>
                     </ContextMenuGroup>
                     <ContextMenuSeparator />
                     <ContextMenuGroup>
-                        <ContextMenuItem>Download</ContextMenuItem>
+                        {/* <ContextMenuItem>Download</ContextMenuItem> */}
                         <ContextMenuItem onClick={handleMoveFile} >Move to</ContextMenuItem>
                         <ContextMenuItem onClick={() => setRenameOpen(true)}>Rename</ContextMenuItem>
                     </ContextMenuGroup>
